@@ -2,12 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
 import api from '../services/api';
-
+import EventRegisterForm from './EventRegisterForm';
 export default function Dashboard({ onLogout }) {
   const [events, setEvents] = useState([]);
   const [registered, setRegistered] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState('');
+  const [showFormEventId, setShowFormEventId] = useState(null);
 
   useEffect(() => {
     // Fetch approved events
@@ -53,7 +54,7 @@ export default function Dashboard({ onLogout }) {
     <>
       <Container className="py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2>🎓 Student Dashboard</h2>
+          <h2> Student Dashboard</h2>
           <Button variant="secondary" onClick={onLogout}>
             Logout
           </Button>
@@ -63,7 +64,7 @@ export default function Dashboard({ onLogout }) {
           <p className="text-muted">No events available at the moment.</p>
         ) : (
           <>
-            <h4 className="mb-3">🗓 Approved Events</h4>
+            <h4 className="mb-3"> Approved Events</h4>
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
               {events.map(event => {
                 // Determine full image URL
@@ -103,26 +104,21 @@ export default function Dashboard({ onLogout }) {
                         </Card.Text>
 
                         {registered.includes(event.id) ? (
-                          <div className="mt-auto d-flex justify-content-between align-items-center">
-                            <span className="text-success">✅ Registered</span>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleUnregister(event.id)}
-                            >
-                              Unregister
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => handleRegister(event.id)}
-                            className="mt-auto"
-                          >
-                            Register
-                          </Button>
-                        )}
+                        <>
+                          <span style={{ color: 'green' }}>✅ Registered</span>
+                          <button onClick={() => handleUnregister(event.id)}>Unregister</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => setShowFormEventId(event.id)}>Register</button>
+                          {showFormEventId === event.id && (
+                            <EventRegisterForm
+                              eventId={event.id}
+                              onClose={() => setShowFormEventId(null)}
+                            />
+                          )}
+                        </>
+                      )}
                       </Card.Body>
                     </Card>
                   </Col>

@@ -1,44 +1,55 @@
 import React, { useState } from 'react';
 import api from '../services/api';
+import { useNavigate } from 'react-router-dom';
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-
-  const handleSubmit = async (e) => {
+  const navigate = useNavigate();
+   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const res = await api.post('token/', { username, password });
       localStorage.setItem('access', res.data.access);
       localStorage.setItem('refresh', res.data.refresh);
-      onLogin();
-    } catch {
-      alert('Invalid credentials.');
+      navigate('/dashboard');  // ✅ Go to React dashboard
+    } catch (err) {
+      alert('Login failed. Please check your credentials.');
+    }
+  };
+  const handleLogin = async () => {
+    try {
+      const res = await api.post('/token/', { username, password });
+
+      // Save tokens
+      localStorage.setItem('access', res.data.access);
+      localStorage.setItem('refresh', res.data.refresh);
+      localStorage.setItem('role', res.data.role);
+      //localStorage.setItem('role', decodedToken.role); 
+
+      // Redirect based on role
+      if (res.data.role === 'student') {
+        navigate('/dashboard'); // student dashboard
+      } else if (res.data.role === 'staff') {
+        navigate('/staff/dashboard'); // optional if you have one
+      } else {
+        // For admin, redirect to Django admin
+        window.location.href = 'http://127.0.0.1:8000/admin/';
+      }
+    } catch (err) {
+      alert('Login failed: ' + (err.response?.data?.detail || 'Unknown error'));
     }
   };
 
   return (
-    <div style={{
-      height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center',
-      background: 'linear-gradient(135deg, #e0eafc, #cfdef3)', fontFamily: 'Arial'
-    }}>
-      <form onSubmit={handleSubmit} style={{
-        padding: '30px', borderRadius: '10px', backgroundColor: '#fff',
-        boxShadow: '0 0 10px rgba(0,0,0,0.1)', minWidth: '300px'
-      }}>
-        <h2 style={{ textAlign: 'center' }}>🎓 Student Login</h2>
-        <input type="text" placeholder="Username" required value={username}
-          onChange={e => setUsername(e.target.value)}
-          style={{ width: '100%', margin: '10px 0', padding: '8px' }} />
-        <input type="password" placeholder="Password" required value={password}
-          onChange={e => setPassword(e.target.value)}
-          style={{ width: '100%', margin: '10px 0', padding: '8px' }} />
-        <button type="submit" style={{
-          width: '100%', padding: '10px', backgroundColor: '#007bff',
-          color: 'white', border: 'none', borderRadius: '5px'
-        }}>
-          Login
-        </button>
+    <div style={{ maxWidth: '400px', margin: '50px auto' }}>
+      <h2>Student Login</h2>
+      <form onSubmit={handleSubmit}>
+        <label>Username:</label><br />
+        <input type="text" value={username} onChange={e => setUsername(e.target.value)} /><br />
+        <label>Password:</label><br />
+        <input type="password" value={password} onChange={e => setPassword(e.target.value)} /><br /><br />
+        <button type="submit">Login</button>
       </form>
     </div>
   );
