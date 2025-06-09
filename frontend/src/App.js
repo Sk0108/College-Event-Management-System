@@ -6,7 +6,9 @@ import Login from './components/Login';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-
+// Main App Component
+// This component manages the application state, handles user authentication, and routes to different dashboards based on user roles.
+// It uses React Router for navigation and Toastify for notifications.
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [role, setRole] = useState(null);
@@ -33,7 +35,11 @@ function App() {
       window.location.href = 'http://127.0.0.1:8000/admin/logout/?next=http://localhost:3000/';
     }
   };
-
+// Function to get the appropriate dashboard based on user role
+  // Returns the StaffDashboard for staff users, StudentDashboard for students, or redirects to home for other roles.
+  // This function is used in the routing logic to determine which dashboard to display.
+  // It checks the user's role and returns the corresponding dashboard component.
+  // If the user is not logged in or has an invalid role, it redirects to the home page.
   const getDashboard = () => {
     if (role === 'staff') return <StaffDashboard onLogout={handleLogout} />;
     if (role === 'student') return <StudentDashboard onLogout={handleLogout} />;

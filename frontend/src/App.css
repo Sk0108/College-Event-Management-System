@@ -7,12 +7,14 @@
   pointer-events: none;
 }
 
+/* Make the app responsive */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+/* App Header Styles */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,6 +26,7 @@
   color: white;
 }
 
+/* App Link Styles */
 .App-link {
   color: #61dafb;
 }

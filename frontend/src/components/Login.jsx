@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +6,11 @@ import { jwtDecode } from 'jwt-decode';
 import './Login.css';
 import { toast } from 'react-toastify';
 
+/*
+ * Login Component
+ * Handles user login, token management, and redirects based on user role.
+ * Displays a background animation and a login form.
+ */ 
 export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');

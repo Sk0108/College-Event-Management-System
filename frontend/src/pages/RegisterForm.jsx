@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+/** * RegisterForm Component
+ * Handles event registration for users.
+ * Collects user details and submits them to the backend API.
+ */
 export default function RegisterForm() {
   const { eventId } = useParams();
   const navigate = useNavigate();
@@ -35,10 +39,13 @@ export default function RegisterForm() {
       alert('Registration failed!');
     }
   };
-
+/* * Render the registration form
+    * Displays input fields for user details and handles form submission.
+    * Uses local state to manage form inputs.
+    */
   return (
     <div style={{ padding: '2rem' }}>
-      <h2>📋 Event Registration</h2>
+      <h2> Event Registration</h2>
       <form onSubmit={handleSubmit}>
         <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} required /><br />
         <input type="text" placeholder="Registration Number" value={registrationNumber} onChange={e => setRegistrationNumber(e.target.value)} required /><br />

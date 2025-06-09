@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+/* * StaffDashboard Component
+ * Allows staff to create events and view pending events for approval.
+ * Displays a form for event creation and lists pending events.
+ */
 export default function StaffDashboard({ onLogout }) {
   const [pendingEvents, setPendingEvents] = useState([]);
   const [title, setTitle] = useState('');

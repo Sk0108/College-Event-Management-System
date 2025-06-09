@@ -1,8 +1,12 @@
-// src/pages/StaffLogin.jsx
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
+/** * StaffLogin Component
+ * Handles staff login functionality, including form submission and token management.
+ * Redirects to the dashboard upon successful login.
+ */
 export default function StaffLogin({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -26,6 +30,7 @@ export default function StaffLogin({ onLogin }) {
     }
   };
 
+    // Render the staff login form
   return (
     <div style={{ padding: '2rem' }}>
       <h2>Staff Login</h2>

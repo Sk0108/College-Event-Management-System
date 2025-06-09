@@ -2,9 +2,12 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+// Landing Component
+// This component serves as the landing page for the College Event Management System.
 const Landing = () => {
   const navigate = useNavigate();
 
+    // Redirect to the appropriate dashboard based on user role
   return (
     <div className="container text-center py-5">
       <h1 className="mb-4"> Welcome to College Event Management System</h1>

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+// This component allows users to register for an event
+// It takes an eventId prop to identify the event and an onClose callback to close the form after submission
 export default function EventRegisterForm({ eventId, onClose }) {
   const [form, setForm] = useState({
     name: '',
@@ -26,10 +28,10 @@ export default function EventRegisterForm({ eventId, onClose }) {
         `http://127.0.0.1:8000/api/events/${eventId}/custom_register/`,
         {
           ...form,
-          event: eventId // ✅ Include the event ID explicitly
+          event: eventId // Include the event ID explicitly
         }
       );
-      setSuccess("✅ Your registration is being confirmed and you will get an email soon.");
+      setSuccess("Your registration is being confirmed and you will get an email soon.");
       setForm({ name: '', registration_number: '', department: '', email: '' });
 
       // Auto-close form after a few seconds (optional)
@@ -50,9 +52,11 @@ export default function EventRegisterForm({ eventId, onClose }) {
     }
   };
 
+    // Render the registration form
+
   return (
     <div style={{ padding: '20px', border: '1px solid #ccc', marginTop: '20px' }}>
-      <h3>📝 Event Registration</h3>
+      <h3> Event Registration</h3>
       <form onSubmit={handleSubmit}>
         <input type="text" name="name" placeholder="Your Name" value={form.name} onChange={handleChange} required /><br /><br />
         <input type="text" name="registration_number" placeholder="Registration Number" value={form.registration_number} onChange={handleChange} required /><br /><br />

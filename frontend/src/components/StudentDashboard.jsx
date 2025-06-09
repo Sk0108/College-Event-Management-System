@@ -4,6 +4,12 @@ import api from '../services/api';
 import EventRegisterForm from './EventRegisterForm';
 import { toast } from 'react-toastify';
 
+/* * StudentDashboard Component
+ * Displays a list of approved events for students to register or unregister.
+  * Allows students to view event details, register, and unregister.
+  * Handles image display in a modal.
+  * Manages event registration state and description toggling.
+ */
 export default function StudentDashboard({ onLogout }) {
   const [events, setEvents] = useState([]);
   const [registered, setRegistered] = useState([]);
@@ -59,10 +65,9 @@ export default function StudentDashboard({ onLogout }) {
 
   return (
     <>
-      <Container className="py-4">
+      <Container className="student-dashboard py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 style={{ color: 'white' }}>Student Dashboard</h2>
-
+          <h2 className="text-white">Student Dashboard</h2>
           <Button variant="secondary" onClick={onLogout}>Logout</Button>
         </div>
 
@@ -70,7 +75,7 @@ export default function StudentDashboard({ onLogout }) {
           <p className="text-muted">No events available at the moment.</p>
         ) : (
           <>
-            <h4 className="mb-3" style={{ color: 'white' }}>Approved Events</h4>
+            <h4 className="mb-3 text-white">Approved Events</h4>
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
               {events.map(event => {
                 const imageUrl = event.image
@@ -86,26 +91,23 @@ export default function StudentDashboard({ onLogout }) {
 
                 return (
                   <Col key={event.id}>
-                    <Card className="h-100 shadow-sm">
+                    <Card className="h-100 shadow-sm event-card">
                       {imageUrl ? (
                         <Card.Img
                           variant="top"
                           src={imageUrl}
                           alt="Event poster"
-                          style={{ cursor: 'pointer', objectFit: 'cover', height: '180px' }}
+                          className="event-image"
                           onClick={() => openModal(imageUrl)}
                         />
                       ) : (
-                        <div
-                          className="bg-light d-flex justify-content-center align-items-center"
-                          style={{ height: '180px', borderTopLeftRadius: '0.25rem', borderTopRightRadius: '0.25rem' }}
-                        >
-                          <span className="text-muted">No Image</span>
+                        <div className="no-image">
+                          <span className="text-white">No Image</span>
                         </div>
                       )}
 
                       <Card.Body className="d-flex flex-column">
-                        <Card.Title>{event.title}</Card.Title>
+                        <Card.Title className="text-primary">{event.title}</Card.Title>
                         <Card.Text className="mb-1">
                           <strong>Date:</strong> {new Date(event.date).toLocaleString()}
                         </Card.Text>
@@ -114,22 +116,24 @@ export default function StudentDashboard({ onLogout }) {
                           {description}
                           {event.description.length > 100 && (
                             <span
-                              style={{ color: '#007bff', cursor: 'pointer', marginLeft: '5px' }}
+                              className="toggle-link"
                               onClick={() => toggleDescription(event.id)}
                             >
-                              {isExpanded ? 'Show Less' : 'Show More'}
+                              {isExpanded ? ' Show Less' : ' Show More'}
                             </span>
                           )}
                         </Card.Text>
 
                         {registered.includes(event.id) ? (
                           <>
-                            <span style={{ color: 'green' }}> Registered</span>
-                            <button onClick={() => handleUnregister(event.id)}>Unregister</button>
+                            <span style={{ color: 'limegreen' }}>✅ Registered</span>
+                            <Button size="sm" variant="outline-danger" className="mt-2" onClick={() => handleUnregister(event.id)}>Unregister</Button>
                           </>
                         ) : (
                           <>
-                            <button onClick={() => setShowFormEventId(event.id)}>Register</button>
+                            <Button size="sm" variant="primary" onClick={() => setShowFormEventId(event.id)}>
+                              Register
+                            </Button>
                             {showFormEventId === event.id && (
                               <EventRegisterForm
                                 eventId={event.id}
