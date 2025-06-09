@@ -1,55 +1,80 @@
 import React, { useState } from 'react';
-import api from '../services/api';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
+import './Login.css';
+import { toast } from 'react-toastify';
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await api.post('token/', { username, password });
-      localStorage.setItem('access', res.data.access);
-      localStorage.setItem('refresh', res.data.refresh);
-      navigate('/dashboard');  // ✅ Go to React dashboard
-    } catch (err) {
-      alert('Login failed. Please check your credentials.');
-    }
+
+  const safeToast = (message) => {
+    setTimeout(() => {
+      toast.success(message, {
+        autoClose: 3000,
+        pauseOnHover: true,
+        closeOnClick: true,
+      });
+    }, 0);
   };
-  const handleLogin = async () => {
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+
     try {
-      const res = await api.post('/token/', { username, password });
+      const res = await axios.post('http://127.0.0.1:8000/api/token/', {
+        username,
+        password
+      });
 
-      // Save tokens
-      localStorage.setItem('access', res.data.access);
-      localStorage.setItem('refresh', res.data.refresh);
-      localStorage.setItem('role', res.data.role);
-      //localStorage.setItem('role', decodedToken.role); 
+      const { access, refresh } = res.data;
+      localStorage.setItem('access', access);
+      localStorage.setItem('refresh', refresh);
 
-      // Redirect based on role
-      if (res.data.role === 'student') {
-        navigate('/dashboard'); // student dashboard
-      } else if (res.data.role === 'staff') {
-        navigate('/staff/dashboard'); // optional if you have one
-      } else {
-        // For admin, redirect to Django admin
-        window.location.href = 'http://127.0.0.1:8000/admin/';
+      const decoded = jwtDecode(access);
+      const role = decoded.role;
+      localStorage.setItem('role', role);
+
+      safeToast(` Welcome back, ${username}!`);
+      onLogin(role);
+
+      if (role === 'student' || role === 'staff') {
+        navigate('/dashboard');
       }
     } catch (err) {
-      alert('Login failed: ' + (err.response?.data?.detail || 'Unknown error'));
+      setError('Invalid username or password');
+      toast.error(' Login failed. Please try again.', {
+        autoClose: 3000,
+        pauseOnHover: true,
+      });
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto' }}>
-      <h2>Student Login</h2>
-      <form onSubmit={handleSubmit}>
-        <label>Username:</label><br />
-        <input type="text" value={username} onChange={e => setUsername(e.target.value)} /><br />
-        <label>Password:</label><br />
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} /><br /><br />
+    <div className="login-container">
+      <div className="background-animation"></div>
+      <form className="login-card" onSubmit={handleLogin}>
+        <h2> Event Portal Login</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          required
+        />
         <button type="submit">Login</button>
+        {error && <p className="error-text">{error}</p>}
       </form>
     </div>
   );

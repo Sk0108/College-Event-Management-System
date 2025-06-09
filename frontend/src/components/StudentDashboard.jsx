@@ -1,22 +1,22 @@
-// src/components/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Modal } from 'react-bootstrap';
 import api from '../services/api';
 import EventRegisterForm from './EventRegisterForm';
-export default function Dashboard({ onLogout }) {
+import { toast } from 'react-toastify';
+
+export default function StudentDashboard({ onLogout }) {
   const [events, setEvents] = useState([]);
   const [registered, setRegistered] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalImage, setModalImage] = useState('');
   const [showFormEventId, setShowFormEventId] = useState(null);
+  const [expandedDescriptions, setExpandedDescriptions] = useState({});
 
   useEffect(() => {
-    // Fetch approved events
     api.get('events/')
       .then(res => setEvents(res.data))
       .catch(err => console.error("Event fetch error:", err));
 
-    // Fetch registered events
     api.get('events/registered/')
       .then(res => setRegistered(res.data.map(e => e.id)))
       .catch(err => console.error("Registered fetch error:", err));
@@ -27,7 +27,7 @@ export default function Dashboard({ onLogout }) {
       await api.post(`events/${eventId}/register/`);
       setRegistered(prev => [...prev, eventId]);
     } catch (err) {
-      alert(err.response?.data?.error || 'Registration failed.');
+      toast.error(err.response?.data?.error || 'Registration failed.');
     }
   };
 
@@ -36,7 +36,7 @@ export default function Dashboard({ onLogout }) {
       await api.post(`events/${eventId}/unregister/`);
       setRegistered(prev => prev.filter(id => id !== eventId));
     } catch (err) {
-      alert(err.response?.data?.error || 'Unregistration failed.');
+      toast.error(err.response?.data?.error || 'Unregistration failed.');
     }
   };
 
@@ -50,29 +50,39 @@ export default function Dashboard({ onLogout }) {
     setModalImage('');
   };
 
+  const toggleDescription = (eventId) => {
+    setExpandedDescriptions(prev => ({
+      ...prev,
+      [eventId]: !prev[eventId]
+    }));
+  };
+
   return (
     <>
       <Container className="py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2> Student Dashboard</h2>
-          <Button variant="secondary" onClick={onLogout}>
-            Logout
-          </Button>
+          <h2 style={{ color: 'white' }}>Student Dashboard</h2>
+
+          <Button variant="secondary" onClick={onLogout}>Logout</Button>
         </div>
 
         {events.length === 0 ? (
           <p className="text-muted">No events available at the moment.</p>
         ) : (
           <>
-            <h4 className="mb-3"> Approved Events</h4>
+            <h4 className="mb-3" style={{ color: 'white' }}>Approved Events</h4>
             <Row xs={1} sm={2} md={3} lg={4} className="g-4">
               {events.map(event => {
-                // Determine full image URL
                 const imageUrl = event.image
-                  ? (event.image.startsWith('http')
-                      ? event.image
-                      : `http://127.0.0.1:8000${event.image}`)
+                  ? (event.image.startsWith('http') ? event.image : `http://127.0.0.1:8000${event.image}`)
                   : '';
+
+                const isExpanded = expandedDescriptions[event.id];
+                const description = isExpanded
+                  ? event.description
+                  : event.description.length > 100
+                    ? `${event.description.slice(0, 100)}...`
+                    : event.description;
 
                 return (
                   <Col key={event.id}>
@@ -99,26 +109,35 @@ export default function Dashboard({ onLogout }) {
                         <Card.Text className="mb-1">
                           <strong>Date:</strong> {new Date(event.date).toLocaleString()}
                         </Card.Text>
-                        <Card.Text className="flex-grow-1 text-truncate">
-                          {event.description}
+
+                        <Card.Text className="flex-grow-1">
+                          {description}
+                          {event.description.length > 100 && (
+                            <span
+                              style={{ color: '#007bff', cursor: 'pointer', marginLeft: '5px' }}
+                              onClick={() => toggleDescription(event.id)}
+                            >
+                              {isExpanded ? 'Show Less' : 'Show More'}
+                            </span>
+                          )}
                         </Card.Text>
 
                         {registered.includes(event.id) ? (
-                        <>
-                          <span style={{ color: 'green' }}>✅ Registered</span>
-                          <button onClick={() => handleUnregister(event.id)}>Unregister</button>
-                        </>
-                      ) : (
-                        <>
-                          <button onClick={() => setShowFormEventId(event.id)}>Register</button>
-                          {showFormEventId === event.id && (
-                            <EventRegisterForm
-                              eventId={event.id}
-                              onClose={() => setShowFormEventId(null)}
-                            />
-                          )}
-                        </>
-                      )}
+                          <>
+                            <span style={{ color: 'green' }}> Registered</span>
+                            <button onClick={() => handleUnregister(event.id)}>Unregister</button>
+                          </>
+                        ) : (
+                          <>
+                            <button onClick={() => setShowFormEventId(event.id)}>Register</button>
+                            {showFormEventId === event.id && (
+                              <EventRegisterForm
+                                eventId={event.id}
+                                onClose={() => setShowFormEventId(null)}
+                              />
+                            )}
+                          </>
+                        )}
                       </Card.Body>
                     </Card>
                   </Col>
@@ -129,7 +148,6 @@ export default function Dashboard({ onLogout }) {
         )}
       </Container>
 
-      {/* Modal for Expanding an Event Poster */}
       <Modal show={showModal} onHide={closeModal} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Event Poster</Modal.Title>

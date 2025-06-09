@@ -1,18 +1,15 @@
-// src/App.js
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Landing from './pages/Landing';
-import StudentLogin from './components/Login';
-import StaffLogin from './pages/StaffLogin';
-import Dashboard from './components/Dashboard';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import StudentDashboard from './components/StudentDashboard';
 import StaffDashboard from './components/StaffDashboard';
-import AdminDashboard from './pages/AdminDashboard';
-import RegisterForm from './pages/RegisterForm';
+import Login from './components/Login';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [role, setRole] = useState(null); // 'student', 'staff', or 'admin'
-  
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access');
@@ -22,38 +19,42 @@ function App() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('access');
-    localStorage.removeItem('refresh');
-    localStorage.removeItem('role');
+    localStorage.clear();
     setLoggedIn(false);
     setRole(null);
   };
 
+  const onLogin = (userRole) => {
+    setLoggedIn(true);
+    setRole(userRole);
+
+    // Redirect based on role immediately after login
+    if (userRole === 'admin') {
+      window.location.href = 'http://127.0.0.1:8000/admin/logout/?next=http://localhost:3000/';
+    }
+  };
+
   const getDashboard = () => {
-    if (role === 'admin') return <AdminDashboard onLogout={handleLogout} />;
     if (role === 'staff') return <StaffDashboard onLogout={handleLogout} />;
-    return <Dashboard onLogout={handleLogout} />;
+    if (role === 'student') return <StudentDashboard onLogout={handleLogout} />;
+    return <Navigate to="/" />;
   };
 
   return (
     <Router>
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} newestOnTop closeOnClick pauseOnHover />
       <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/register-form/:eventId" element={<RegisterForm />} />
-        <Route path="/student/login" element={<StudentLogin onLogin={(r) => {
-          setLoggedIn(true);
-          setRole(r);
-        }} />} />
-        <Route path="/staff/login" element={<StaffLogin onLogin={(r) => {
-          setLoggedIn(true);
-          setRole(r);
-        }} />} />
+        <Route path="/" element={<Login onLogin={onLogin} />} />
         <Route path="/dashboard" element={loggedIn ? getDashboard() : <Navigate to="/" />} />
         <Route path="*" element={<h2 style={{ padding: '2rem' }}>404 - Page not found</h2>} />
       </Routes>
+      
+      <ToastContainer />
     </Router>
+    
   );
 }
 
 export default App;
+
 
