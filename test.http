@@ -1,2 +1,5 @@
-POST http://127.0.0.1:8000/api/events/1/register/
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ5MDE5OTM4LCJpYXQiOjE3NDkwMTk2MzgsImp0aSI6ImY5MzRhYTUxODk1YjRjNjY5ZWZiNzk5MGJkMDFkY2YzIiwidXNlcl9pZCI6M30.HbzzpB8zQChUnYIwDLSoRgL6m5R0pPtThsngBa_MHzA
+http://127.0.0.1:8000/api/token/
+{
+  "username": "test_staff",
+  "password": "teststaff@123"
+}

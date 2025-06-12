@@ -17,6 +17,12 @@ export default function RegisterForm() {
 
   const token = localStorage.getItem('access');
 
+  /* * handleSubmit function
+    * Handles form submission for event registration.
+    * Sends user details to the backend API for registration.
+    * Displays success or error messages based on the response. 
+    * @param {Object} e - The event object from the form submission.
+    */
   const handleSubmit = async (e) => {
     e.preventDefault();
 

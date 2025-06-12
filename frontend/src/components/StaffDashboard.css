@@ -1,0 +1,28 @@
+.staff-dashboard {
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+.staff-dashboard h1 {
+  font-family: 'Helvetica Neue', sans-serif;
+}
+.toolbar button {
+  transition: transform .2s;
+}
+.toolbar button:hover {
+  transform: scale(1.05);
+}
+.form-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+.events-card {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+.events-card h2 {
+  margin-bottom: 1rem;
+}

@@ -28,37 +28,35 @@ export default function Login({ onLogin }) {
   };
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
+  e.preventDefault();
+  setError('');
 
-    try {
-      const res = await axios.post('http://127.0.0.1:8000/api/token/', {
-        username,
-        password
-      });
+  try {
+    const res = await axios.post('http://127.0.0.1:8000/api/token/', {
+      username,
+      password
+    });
 
-      const { access, refresh } = res.data;
-      localStorage.setItem('access', access);
-      localStorage.setItem('refresh', refresh);
+    const { access, refresh } = res.data;
+    localStorage.setItem('access', access);
+    localStorage.setItem('refresh', refresh);
 
-      const decoded = jwtDecode(access);
-      const role = decoded.role;
-      localStorage.setItem('role', role);
+    const decoded = jwtDecode(access);
+    localStorage.setItem('username', decoded.username);
+    const role = decoded.role;
+    localStorage.setItem('role', role);
 
-      safeToast(` Welcome back, ${username}!`);
-      onLogin(role);
+    onLogin(role);  // ✅ updates App.js state
 
-      if (role === 'student' || role === 'staff') {
-        navigate('/dashboard');
-      }
-    } catch (err) {
-      setError('Invalid username or password');
-      toast.error(' Login failed. Please try again.', {
-        autoClose: 3000,
-        pauseOnHover: true,
-      });
-    }
-  };
+    // 🔥 Add correct navigation based on role
+    if (role === 'admin') navigate('/admin/dashboard');
+    else navigate('/dashboard');
+
+    toast.success(`Welcome back, ${username}!`);
+  } catch (err) {
+    setError('Invalid username or password');
+  }
+};
 
   return (
     <div className="login-container">

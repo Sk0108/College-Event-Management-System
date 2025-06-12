@@ -5,19 +5,22 @@ import StaffDashboard from './components/StaffDashboard';
 import Login from './components/Login';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import AdminDashboard from './pages/AdminDashboard';
 
-// Main App Component
-// This component manages the application state, handles user authentication, and routes to different dashboards based on user roles.
-// It uses React Router for navigation and Toastify for notifications.
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(null); // null = loading, true/false = known
   const [role, setRole] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('access');
     const userRole = localStorage.getItem('role');
-    setLoggedIn(!!token);
-    setRole(userRole);
+
+    if (token && userRole) {
+      setLoggedIn(true);
+      setRole(userRole);
+    } else {
+      setLoggedIn(false);
+    }
   }, []);
 
   const handleLogout = () => {
@@ -29,22 +32,19 @@ function App() {
   const onLogin = (userRole) => {
     setLoggedIn(true);
     setRole(userRole);
-
-    // Redirect based on role immediately after login
-    if (userRole === 'admin') {
-      window.location.href = 'http://127.0.0.1:8000/admin/logout/?next=http://localhost:3000/';
-    }
   };
-// Function to get the appropriate dashboard based on user role
-  // Returns the StaffDashboard for staff users, StudentDashboard for students, or redirects to home for other roles.
-  // This function is used in the routing logic to determine which dashboard to display.
-  // It checks the user's role and returns the corresponding dashboard component.
-  // If the user is not logged in or has an invalid role, it redirects to the home page.
+
   const getDashboard = () => {
+    if (role === 'admin') return <AdminDashboard onLogout={handleLogout} />;
     if (role === 'staff') return <StaffDashboard onLogout={handleLogout} />;
     if (role === 'student') return <StudentDashboard onLogout={handleLogout} />;
     return <Navigate to="/" />;
   };
+
+  if (loggedIn === null) {
+    // Optional loading indicator while checking
+    return <div style={{ color: 'white', padding: '2rem' }}>Loading...</div>;
+  }
 
   return (
     <Router>
@@ -52,15 +52,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Login onLogin={onLogin} />} />
         <Route path="/dashboard" element={loggedIn ? getDashboard() : <Navigate to="/" />} />
-        <Route path="*" element={<h2 style={{ padding: '2rem' }}>404 - Page not found</h2>} />
+        <Route path="/admin/dashboard" element={loggedIn && role === 'admin' ? <AdminDashboard onLogout={handleLogout} /> : <Navigate to="/" />} />
+        <Route path="*" element={<h2 style={{ padding: '2rem', color: 'white' }}>404 - Page not found</h2>} />
       </Routes>
-      
-      <ToastContainer />
     </Router>
-    
   );
 }
 
 export default App;
-
-

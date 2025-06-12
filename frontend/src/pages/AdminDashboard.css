@@ -1,0 +1,27 @@
+.admin-dashboard {
+  background: linear-gradient(135deg, #111827, #1f2937);
+  min-height: 100vh;
+  color: #e5e7eb;
+}
+.logo {
+  font-family: 'Helvetica Neue', sans-serif;
+  font-size: 2rem;
+  letter-spacing: 1px;
+}
+.sidebar .nav-link {
+  margin-bottom: 1rem;
+  color: #e5e7eb;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: background-color .2s;
+}
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.pane-card {
+  background: #1f2937;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
