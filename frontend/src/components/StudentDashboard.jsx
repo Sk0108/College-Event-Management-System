@@ -4,6 +4,11 @@ import api from '../services/api';
 import EventRegisterForm from './EventRegisterForm';
 import { toast } from 'react-toastify';
 import Chatbot from './Chatbot';
+import CardContainer from './Container';
+import CourselCard from './ui/card';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function StudentDashboard({ onLogout }) {
   const [events, setEvents] = useState([]);
@@ -73,12 +78,43 @@ export default function StudentDashboard({ onLogout }) {
       return new Date(a.date) - new Date(b.date);
     });
 
+
+  console.log(upcoming, "upcoming")
   return (
     <>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <CardContainer>
+          <Slider dots={true} infinite={true} speed={1000} slidesToShow={3} slidesToScroll={1}></Slider>
+          {events.map((event, idx) => {
+            const imageUrl = event.image
+              ? (event.image.startsWith('http') ? event.image : `http://127.0.0.1:8000${event.image}`)
+              : '';
+            return (
+              <CourselCard
+                key={event.id || idx}
+                title={event.title}
+                description={event.description}
+                image={imageUrl}
+              />
+            );
+          })}
+        </CardContainer>
+      </div>
+
+
       <Container className="student-dashboard py-4">
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="text-white">Student Dashboard</h2>
-          <Button variant="secondary" onClick={onLogout}>Logout</Button>
+          <h2 className="text-white" style={{
+            fontFamily: "'Orbitron', 'Segoe UI', Arial, sans-serif",
+            letterSpacing: '2px',
+            fontWeight: 700,
+            fontSize: '2.5rem',
+            textShadow: '2px 2px 8px #222, 0 0 10px #00e6e6',
+            textAlign: 'center',
+            width: '100%',
+          }}
+          >Student Dashboard</h2>
+          <Button variant="secondary" onClick={onLogout} className='mt-2'>Logout</Button>
         </div>
 
         {/* Filters */}
@@ -94,7 +130,59 @@ export default function StudentDashboard({ onLogout }) {
             <option value="oldest">Oldest</option>
           </Form.Select>
         </div>
-
+        <div style={{
+        position: "relative",
+        width: "100%",
+        height: "100px",
+        marginBottom: "-60px", // Pulls the cards up over the SVG
+        zIndex: 0,
+        overflow: "hidden"
+      }}>
+        <svg
+          width="100%"
+          height="100"
+          viewBox="0 0 1200 100"
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            zIndex: 0,
+            pointerEvents: "none"
+          }}
+        >
+          <defs>
+            <path
+              id="curve"
+              d="M 0 80 Q 600 0 1200 80"
+              fill="transparent"
+            />
+          </defs>
+          <text
+            fontSize="48"
+            fill="#ececec"
+            opacity="0.13"
+            fontFamily="'Orbitron', 'Segoe UI', Arial, sans-serif"
+            letterSpacing="4px"
+          >
+            <textPath
+              href="#curve"
+              startOffset="0%"
+              id="floatingText"
+            >
+              fresh happenings on campus • fresh happenings on campus • fresh happenings on campus •
+            </textPath>
+            <animate
+              xlinkHref="#floatingText"
+              attributeName="startOffset"
+              from="0%"
+              to="100%"
+              dur="12s"
+              repeatCount="indefinite"
+            />
+          </text>
+        </svg>
+      </div>
+      <Row xs={1} sm={2} md={3} lg={4} className="g-4" style={{ position: "relative", zIndex: 1 }}></Row>
         <h4 className="mb-3 text-white">Approved Events</h4>
         <Row xs={1} sm={2} md={3} lg={4} className="g-4">
           {filteredEvents.map(event => {
@@ -167,7 +255,7 @@ export default function StudentDashboard({ onLogout }) {
         </Row>
 
         {/* Upcoming Events */}
-        <h4 className="mt-5 text-white">Your Upcoming Events</h4>
+        <h4 className="mt-5 text-white">Registered Events</h4>
         {events.filter(e => upcoming.includes(e.id)).length === 0 ? (
           <p className="text-muted">No upcoming approved events.</p>
         ) : (
@@ -201,4 +289,5 @@ export default function StudentDashboard({ onLogout }) {
       </Modal>
     </>
   );
+
 }

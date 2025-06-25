@@ -1,5 +1,5 @@
 .admin-dashboard {
-  background: linear-gradient(135deg, #111827, #1f2937);
+  background: linear-gradient(135deg, #eef0f3, #eef0f3);
   min-height: 100vh;
   color: #e5e7eb;
 }
@@ -20,7 +20,7 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 .pane-card {
-  background: #1f2937;
+  background: #f8f9fa;
   padding: 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);

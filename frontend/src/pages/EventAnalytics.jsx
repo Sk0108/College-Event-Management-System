@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Pie } from 'react-chartjs-2';
 import api from '../services/api';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import ParticipantsTable from './ParticipantsTable';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function EventAnalytics() {
@@ -11,6 +10,14 @@ export default function EventAnalytics() {
   const [registrations, setRegistrations] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
 
+function generateColors(num) {
+  const colors = [];
+  for (let i = 0; i < num; i++) {
+    // Use HSL for evenly spaced colors
+    colors.push(`hsl(${(i * 360) / num}, 70%, 55%)`);
+  }
+  return colors;
+}
   useEffect(() => {
     api.get('events/')
       .then(res => setAnalyticsData(res.data))
@@ -52,9 +59,8 @@ export default function EventAnalytics() {
       {
         label: 'Participants',
         data: analyticsData.map(event => event.registrations_count || 0),
-        backgroundColor: [
-          '#ff6384', '#36a2eb', '#ffce56', '#4bc0c0', '#9966ff', '#f67019'
-        ],
+        // Dynamically generate colors based on the number of events
+        backgroundColor: generateColors(analyticsData.length),
         borderWidth: 1
       }
     ]
