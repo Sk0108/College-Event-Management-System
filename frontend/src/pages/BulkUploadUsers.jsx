@@ -1,39 +1,31 @@
+// src/components/BulkUploadUsers.jsx
 import React, { useState } from 'react';
-import axios from 'axios';
+import { Form, Button } from 'react-bootstrap';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 
 export default function BulkUploadUsers() {
   const [file, setFile] = useState(null);
 
-  const handleUpload = async () => {
-    if (!file) {
-      toast.error("Please select a CSV file");
-      return;
-    }
+  const handleUpload = async e => {
+    e.preventDefault();
+    if (!file) return toast.error("Please select a CSV file");
 
     const formData = new FormData();
-    formData.append("file", file);  // 'file' must match the name used in views.py
+    formData.append('file', file);
 
     try {
-      const token = localStorage.getItem('access');
-      await axios.post('http://127.0.0.1:8000/api/bulk-upload/', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      toast.success(" Users uploaded successfully!");
-    } catch (err) {
-      console.error("Upload error:", err);
-      toast.error(" Upload failed. Check console.");
+      await api.post('/users/bulk_upload/', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      toast.success("Users uploaded successfully");
+    } catch {
+      toast.error("Upload failed");
     }
   };
 
   return (
-    <div style={{ marginTop: '20px' }}>
-      <h5>Bulk Upload Users (CSV)</h5>
-      <input type="file" accept=".csv" onChange={(e) => setFile(e.target.files[0])} />
-      <button onClick={handleUpload} style={{ marginTop: '10px' }}>Upload</button>
-    </div>
+    <Form onSubmit={handleUpload} className="glass-card">
+      <Form.Control type="file" accept=".csv" onChange={e => setFile(e.target.files[0])} className="mb-2" />
+      <Button type="submit" className="w-100">Upload CSV</Button>
+    </Form>
   );
 }

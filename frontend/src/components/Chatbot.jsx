@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import './Chatbot.css';
+// This component provides a simple AI chatbot interface
+// It displays a list of preset questions and answers
+// Users can click on a question to see the answer  
+// The chatbot can be toggled open or closed by clicking the icon
 
 const presetQuestions = [
   { q: "How do I register for an event?", a: "Click on the 'Register' button below the event card. Fill in your details and submit." },
@@ -30,7 +34,9 @@ export default function Chatbot() {
         <div className="chatbot-window">
           <div className="chatbot-header"> Hi, I’m your AI assistant!</div>
           <div className="chatbot-body">
+            {/* Displaying preset questions and answers */}
             {presetQuestions.map((item, idx) => (
+              // Each question is clickable and shows the answer when active
               <div key={idx} className="chatbot-question" onClick={() => setActiveAnswer(idx)}>
                 {item.q}
                 {activeAnswer === idx && <div className="chatbot-answer">{item.a}</div>}

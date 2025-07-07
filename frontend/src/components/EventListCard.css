@@ -1,0 +1,25 @@
+.event-list-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.event-item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0;
+}
+
+.event-item:last-child {
+  border-bottom: none;
+}
+
+.event-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 1rem;
+  color: #007bff;
+}

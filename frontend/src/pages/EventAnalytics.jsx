@@ -5,6 +5,11 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function EventAnalytics() {
+  // State to hold analytics data, selected event, registrations, and selected rows
+  // analyticsData holds the list of events with their registration counts
+  // selectedEvent holds the currently selected event ID for fetching participants
+  // registrations holds the list of participants for the selected event
+  // selectedRows holds the IDs of participants selected for bulk actions
   const [analyticsData, setAnalyticsData] = useState([]);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [registrations, setRegistrations] = useState([]);
@@ -44,8 +49,10 @@ function generateColors(num) {
   const bulkAction = async (action) => {
     if (!selectedEvent || selectedRows.length === 0) return;
     try {
+      // Construct the URL based on the action
       const url = `events/${selectedEvent}/${action}/`;
       const res = await api.post(url, { ids: selectedRows });
+      // Show success message with the number of registrations affected
       alert(`${res.data.updated_count} registrations ${action.replace('_', ' ')}!`);
       fetchParticipants(selectedEvent); // refresh
     } catch (err) {
@@ -54,10 +61,12 @@ function generateColors(num) {
   };
 
   const data = {
+    // Use event titles as labels
     labels: analyticsData.map(event => event.title),
     datasets: [
       {
         label: 'Participants',
+        // Use registrations_count or 0 if undefined
         data: analyticsData.map(event => event.registrations_count || 0),
         // Dynamically generate colors based on the number of events
         backgroundColor: generateColors(analyticsData.length),
@@ -93,6 +102,7 @@ function generateColors(num) {
 
           <table className="table table-dark mt-3">
             <thead>
+              
               <tr>
                 <th></th>
                 <th>Name</th>
@@ -107,11 +117,13 @@ function generateColors(num) {
                 <tr key={r.id}>
                   <td>
                     <input
+                    // Use a checkbox to select rows
                       type="checkbox"
                       checked={selectedRows.includes(r.id)}
                       onChange={() => toggleRow(r.id)}
                     />
                   </td>
+                  
                   <td>{r.name}</td>
                   <td>{r.registration_number}</td>
                   <td>{r.email}</td>

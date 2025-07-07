@@ -1,89 +1,64 @@
-// src/pages/EventApprovals.jsx
+// src/components/EventApprovals.jsx
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Button, Card, Form } from 'react-bootstrap';
+import { Button, Table, Form } from 'react-bootstrap';
+import api from '../services/api';
 import { toast } from 'react-toastify';
 
 export default function EventApprovals() {
-  const [pendingEvents, setPendingEvents] = useState([]);
-  const [rejectionReasons, setRejectionReasons] = useState({});
-  const token = localStorage.getItem('access');
+  const [events, setEvents] = useState([]);
+  const [reasons, setReasons] = useState({});
 
   useEffect(() => {
-    fetchPending();
+    api.get('/events/pending/').then(res => setEvents(res.data));
   }, []);
 
-  const fetchPending = () => {
-    axios.get('http://127.0.0.1:8000/api/events/pending/', {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => setPendingEvents(res.data))
-      .catch(err => toast.error('❌ Could not load events'));
-  };
-
-  const approveEvent = (id) => {
-    axios.patch(`http://127.0.0.1:8000/api/events/${id}/approve/`, {
-      is_approved: true
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+  const handleAction = (id, isApproved) => {
+    const payload = { is_approved: isApproved };
+    if (!isApproved) payload.rejection_reason = reasons[id] || '';
+    api.patch(`/events/${id}/approve/`, payload)
       .then(() => {
-        toast.success('✅ Event approved');
-        fetchPending();
+        toast.success(`Event ${isApproved ? 'approved' : 'rejected'}`);
+        setEvents(events.filter(e => e.id !== id));
       })
-      .catch(() => toast.error('❌ Approval failed'));
-  };
-
-  const rejectEvent = (id) => {
-    const reason = rejectionReasons[id];
-    if (!reason) {
-      toast.error('Please provide a rejection reason');
-      return;
-    }
-
-    axios.patch(`http://127.0.0.1:8000/api/events/${id}/approve/`, {
-      is_approved: false,
-      rejection_reason: reason
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(() => {
-        toast.info('❌ Event rejected');
-        fetchPending();
-      })
-      .catch(() => toast.error('❌ Rejection failed'));
-  };
-
-  const handleReasonChange = (id, value) => {
-    setRejectionReasons(prev => ({ ...prev, [id]: value }));
+      .catch(() => toast.error("Action failed"));
   };
 
   return (
-    <div>
-      <h4 className="mb-3"> Pending Event Approvals</h4>
-      {pendingEvents.length === 0 ? (
-        <p>No events awaiting approval.</p>
-      ) : (
-        pendingEvents.map(event => (
-          <Card key={event.id} className="mb-3 shadow-sm">
-            <Card.Body>
-              <Card.Title>{event.title}</Card.Title>
-              <Card.Subtitle className="mb-2 text-muted">{new Date(event.date).toLocaleString()}</Card.Subtitle>
-              <Card.Text>{event.description}</Card.Text>
-              <div className="d-flex gap-3">
-                <Button variant="success" onClick={() => approveEvent(event.id)}>Approve</Button>
+    <div className="glass-card">
+      <h5>Pending Event Approvals</h5>
+      <Table bordered responsive>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Staff</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map(e => (
+            <tr key={e.id}>
+              <td>{e.title}</td>
+              <td>{e.created_by_name}</td>
+              <td>{e.category}</td>
+              <td>{new Date(e.date).toLocaleString()}</td>
+              <td>
+                <Button variant="success" size="sm" onClick={() => handleAction(e.id, true)}>Approve</Button>{' '}
                 <Form.Control
-                  placeholder="Reason for rejection"
-                  value={rejectionReasons[event.id] || ''}
-                  onChange={(e) => handleReasonChange(event.id, e.target.value)}
-                  style={{ maxWidth: 250 }}
+                  size="sm"
+                  type="text"
+                  placeholder="Rejection Reason"
+                  value={reasons[e.id] || ''}
+                  onChange={e2 => setReasons({ ...reasons, [e.id]: e2.target.value })}
+                  className="my-1"
                 />
-                <Button variant="danger" onClick={() => rejectEvent(event.id)}>Reject</Button>
-              </div>
-            </Card.Body>
-          </Card>
-        ))
-      )}
+                <Button variant="danger" size="sm" onClick={() => handleAction(e.id, false)}>Reject</Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
     </div>
   );
 }

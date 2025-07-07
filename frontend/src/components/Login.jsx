@@ -26,7 +26,7 @@ export default function Login({ onLogin }) {
       });
     }, 0);
   };
-
+// Function to handle login submission
   const handleLogin = async (e) => {
   e.preventDefault();
   setError('');
@@ -36,19 +36,19 @@ export default function Login({ onLogin }) {
       username,
       password
     });
-
+// Store tokens in localStorage
     const { access, refresh } = res.data;
     localStorage.setItem('access', access);
     localStorage.setItem('refresh', refresh);
-
+// Decode the access token to get user details
     const decoded = jwtDecode(access);
     localStorage.setItem('username', decoded.username);
     const role = decoded.role;
     localStorage.setItem('role', role);
+// Call the onLogin function to update the App.js state
+    onLogin(role);  // updates App.js state
 
-    onLogin(role);  // ✅ updates App.js state
-
-    // 🔥 Add correct navigation based on role
+    //  Add correct navigation based on role
     if (role === 'admin') navigate('/admin/dashboard');
     else navigate('/dashboard');
 
@@ -57,7 +57,7 @@ export default function Login({ onLogin }) {
     setError('Invalid username or password');
   }
 };
-
+// Render the login form with background animation
   return (
     <div className="login-container">
       <div className="background-animation"></div>
@@ -70,6 +70,7 @@ export default function Login({ onLogin }) {
           onChange={e => setUsername(e.target.value)}
           required
         />
+        
         <input
           type="password"
           placeholder="Password"
